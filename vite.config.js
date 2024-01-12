@@ -10,6 +10,7 @@ export default defineConfig({
       "/api": {
         target: "https://todo-backend-7ahb.onrender.com",
         changeOrigin: true,
+        secure: true,
       },
     },
   },
