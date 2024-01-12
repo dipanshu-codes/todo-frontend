@@ -3,7 +3,7 @@ export default function Landing() {
     <div className="h-1/2">
       <header className="text-center">
         <h1 className="my-10 mx-8 md:mx-14 lg:mx-28 text-slate-700 text-xl md:text-2xl lg:text-4xl font-bold">
-          This is a full-stack todo web app build with Reactjs, Tailwincss,
+          This is a full-stack todo web app build with Reactjs, Tailwindcss,
           Express, MongoDB.
         </h1>
         <p className="text-lg font-normal px-20 my-10 text-slate-500">

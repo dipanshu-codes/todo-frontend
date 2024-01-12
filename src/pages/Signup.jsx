@@ -1,10 +1,69 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Toaster, toast } from "sonner";
+
+const signupSchema = z.object({
+  fullName: z
+    .string()
+    .min(2, { message: "Full name must be atleast 2 characters..." }),
+  email: z.string().email(),
+  password: z
+    .string()
+    .min(5, "Password must be between 6-10 characters long...")
+    .max(10),
+});
 
 export default function Signup() {
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(signupSchema),
+  });
+
+  async function onSignup(data) {
+    const { fullName, email, password } = data;
+
+    const request = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fullName,
+        email,
+        password,
+      }),
+    });
+    const response = await request.json();
+
+    if (request.ok) {
+      toast.success("😊User created successfully...");
+      localStorage.setItem("user", JSON.stringify(response.token));
+      setTimeout(function () {
+        navigate("/dashboard");
+      }, 3000);
+    } else {
+      toast.error(`😤${response.msg}`);
+    }
+
+    reset();
+  }
+
   return (
     <div className="max-w-lg mx-auto my-10">
       {/*<!-- Component: Card with form --> */}
-      <form className="overflow-hidden rounded bg-white text-slate-500 shadow-md shadow-slate-200">
+      <Toaster richColors />
+      <form
+        onSubmit={handleSubmit(onSignup)}
+        className="overflow-hidden rounded bg-white text-slate-500 shadow-md shadow-slate-200"
+      >
         {/*  <!-- Body--> */}
         <div className="p-6">
           <header className="mb-4 text-center">
@@ -14,10 +73,11 @@ export default function Signup() {
             {/*      <!-- Input field --> */}
             <div className="relative mt-6">
               <input
-                id="fullname"
+                id="fullName"
                 type="text"
-                name="fullname"
+                name="fullName"
                 placeholder="your full name"
+                {...register("fullName", { required: true })}
                 className="peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
               />
               <label
@@ -26,6 +86,10 @@ export default function Signup() {
               >
                 Your name
               </label>
+
+              {errors.fullName && (
+                <span className="text-red-500">{errors.fullName.message}</span>
+              )}
             </div>
             {/*      <!-- Input field --> */}
             <div className="relative mt-6">
@@ -34,6 +98,7 @@ export default function Signup() {
                 type="email"
                 name="email"
                 placeholder="your email"
+                {...register("email", { required: true })}
                 className="peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
               />
               <label
@@ -42,6 +107,10 @@ export default function Signup() {
               >
                 Your email
               </label>
+
+              {errors.email && (
+                <span className="text-red-500">{errors.email.message}</span>
+              )}
             </div>
             {/*      <!-- Input field --> */}
             <div className="relative my-6">
@@ -50,6 +119,7 @@ export default function Signup() {
                 type="password"
                 name="password"
                 placeholder="your password"
+                {...register("password", { required: true })}
                 className="peer relative h-10 w-full rounded border border-slate-200 px-4 pr-12 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
               />
               <label
@@ -58,6 +128,10 @@ export default function Signup() {
               >
                 Your password
               </label>
+
+              {errors.password && (
+                <span className="text-red-500">{errors.password.message}</span>
+              )}
             </div>
           </div>
         </div>

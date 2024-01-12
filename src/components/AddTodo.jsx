@@ -1,5 +1,20 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
+
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const createTodoSchema = z.object({
+  title: z
+    .string()
+    .min(4, { message: "Title must be atleast 4 characters long..." }),
+  description: z
+    .string()
+    .min(10, { message: "Description must be atleast 10 characters long..." })
+    .max(50)
+    .optional(),
+});
 
 export default function ModalForm() {
   const [isShowing, setIsShowing] = useState(false);
@@ -72,6 +87,22 @@ export default function ModalForm() {
     }
   }, [isShowing]);
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isLoading },
+  } = useForm({
+    mode: "onChange",
+    resolver: zodResolver(createTodoSchema),
+  });
+
+  function onCreateTodo(data) {
+    const { title, description } = data;
+    console.log(`${title}, ${description}`);
+    reset();
+  }
+
   return (
     <>
       <button
@@ -99,7 +130,10 @@ export default function ModalForm() {
               >
                 {/*        <!-- Modal body --> */}
                 <div id="content-4a" className="flex-1">
-                  <div className="flex flex-col gap-6 m-10">
+                  <form
+                    onSubmit={handleSubmit(onCreateTodo)}
+                    className="flex flex-col gap-6 m-10"
+                  >
                     {/* <!-- Input field --> */}
                     <div className="relative">
                       <input
@@ -107,6 +141,7 @@ export default function ModalForm() {
                         type="text"
                         name="title"
                         placeholder="write your title"
+                        {...register("title", { required: true })}
                         className="peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
                       />
                       <label
@@ -115,6 +150,12 @@ export default function ModalForm() {
                       >
                         Title
                       </label>
+
+                      {errors.title && (
+                        <span className="text-red-500">
+                          {errors.title.message}
+                        </span>
+                      )}
                     </div>
                     {/* <!-- Component: Rounded base size basic textarea --> */}
                     <div className="relative">
@@ -124,6 +165,7 @@ export default function ModalForm() {
                         name="description"
                         placeholder="Write your description"
                         rows="3"
+                        {...register("description")}
                         className="relative w-full px-4 py-2 text-sm placeholder-transparent transition-all border rounded outline-none focus-visible:outline-none peer border-slate-200 text-slate-500 autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
                       ></textarea>
                       <label
@@ -132,6 +174,12 @@ export default function ModalForm() {
                       >
                         Description
                       </label>
+
+                      {errors.description && (
+                        <span className="text-red-500">
+                          {errors.description.message}
+                        </span>
+                      )}
                     </div>
                     {/* <!-- End Rounded base size basic textarea --> */}
 
@@ -141,7 +189,7 @@ export default function ModalForm() {
                         <span>Add</span>
                       </button>
                     </div>
-                  </div>
+                  </form>
                 </div>
               </div>
             </div>,

@@ -1,10 +1,62 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Toaster, toast } from "sonner";
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z
+    .string()
+    .min(5, "Password must be 6-10 characters long...")
+    .max(10),
+});
 
 export default function Login() {
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
+
+  async function onLogin(data) {
+    const { email, password } = data;
+    const request = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+    const response = await request.json();
+
+    if (request.ok) {
+      toast.success("😊Credentials verified successfully...");
+      localStorage.setItem("user", JSON.stringify(response.token));
+      navigate("/dashboard");
+    } else {
+      toast.error(`😤${response.msg}`);
+    }
+
+    reset();
+  }
+
   return (
     <div className="max-w-lg mx-auto my-10">
+      <Toaster richColors />
       {/*<!-- Component: Card with form --> */}
-      <form className="overflow-hidden rounded bg-white text-slate-500 shadow-md shadow-slate-200">
+      <form
+        onSubmit={handleSubmit(onLogin)}
+        className="overflow-hidden rounded bg-white text-slate-500 shadow-md shadow-slate-200"
+      >
         {/*  <!-- Body--> */}
         <div className="p-6">
           <header className="mb-4 text-center">
@@ -18,6 +70,7 @@ export default function Login() {
                 type="email"
                 name="email"
                 placeholder="your email"
+                {...register("email", { required: true })}
                 className="peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
               />
               <label
@@ -26,6 +79,10 @@ export default function Login() {
               >
                 Your email
               </label>
+
+              {errors.email && (
+                <span className="text-red-500">{errors.email.message}</span>
+              )}
             </div>
             {/*      <!-- Input field --> */}
             <div className="relative my-6">
@@ -34,6 +91,9 @@ export default function Login() {
                 type="password"
                 name="password"
                 placeholder="your password"
+                {...register("password", {
+                  required: true,
+                })}
                 className="peer relative h-10 w-full rounded border border-slate-200 px-4 pr-12 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
               />
               <label
@@ -42,6 +102,10 @@ export default function Login() {
               >
                 Your password
               </label>
+
+              {errors.password && (
+                <span className="text-red-500">{errors.password.message}</span>
+              )}
             </div>
           </div>
         </div>
