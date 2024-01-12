@@ -26,16 +26,19 @@ export default function Login() {
 
   async function onLogin(data) {
     const { email, password } = data;
-    const request = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
+    const request = await fetch(
+      "https://todo-backend-7ahb.onrender.com/api/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
     const response = await request.json();
 
     if (request.ok) {

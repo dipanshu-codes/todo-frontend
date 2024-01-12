@@ -30,17 +30,20 @@ export default function Signup() {
   async function onSignup(data) {
     const { fullName, email, password } = data;
 
-    const request = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        fullName,
-        email,
-        password,
-      }),
-    });
+    const request = await fetch(
+      "https://todo-backend-7ahb.onrender.com/api/auth/signup",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+        }),
+      }
+    );
     const response = await request.json();
 
     if (request.ok) {
