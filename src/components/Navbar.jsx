@@ -7,7 +7,7 @@ export default function Navbar() {
 
   function handleLogout() {
     localStorage.removeItem("user");
-    toast.success("✅Successfully logged out...");
+    toast.success("Successfully logged out...");
     navigate("/");
   }
 

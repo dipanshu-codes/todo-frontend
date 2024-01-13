@@ -26,27 +26,24 @@ export default function Login() {
 
   async function onLogin(data) {
     const { email, password } = data;
-    const request = await fetch(
-      "https://todo-backend-7ahb.onrender.com/api/auth/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      }
-    );
+    const request = await fetch("http://localhost:2121/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
     const response = await request.json();
 
     if (request.ok) {
-      toast.success("😊Credentials verified successfully...");
+      toast.success("Credentials verified successfully...");
       localStorage.setItem("user", JSON.stringify(response.token));
       navigate("/dashboard");
     } else {
-      toast.error(`😤${response.msg}`);
+      toast.error(`${response.msg}`);
     }
 
     reset();

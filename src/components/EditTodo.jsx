@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Toaster, toast } from "sonner";
 
 const editTodoSchema = z.object({
   title: z
@@ -19,8 +20,9 @@ const editTodoSchema = z.object({
     .optional(),
 });
 
-export default function EditTodo() {
+export default function EditTodo({ todoId }) {
   const [isShowing, setIsShowing] = useState(false);
+  const [todo, setTodo] = useState(null);
 
   const wrapperRef = useRef(null);
 
@@ -90,6 +92,27 @@ export default function EditTodo() {
     }
   }, [isShowing]);
 
+  async function getTodo() {
+    const request = await fetch(`http://localhost:2121/api/todo/${todoId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+      },
+    });
+
+    const response = await request.json();
+
+    if (request.status === 200) {
+      setTodo(response.todo);
+    } else {
+      toast.error(response.msg);
+    }
+  }
+
+  useEffect(() => {
+    getTodo();
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -99,14 +122,35 @@ export default function EditTodo() {
     resolver: zodResolver(editTodoSchema),
   });
 
-  function onEditTodo(data) {
+  async function onEditTodo(data) {
     const { title, description } = data;
-    console.log(`${title}, ${description}`);
+
+    const request = await fetch(`http://localhost:2121/api/todo/${todoId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description,
+      }),
+    });
+
+    const response = await request.json();
+
+    if (request.status === 200) {
+      toast.success("Todo updated...");
+    } else {
+      toast.error(response.msg);
+    }
+
     reset();
   }
 
   return (
     <>
+      <Toaster richColors />
       <button
         onClick={() => setIsShowing(true)}
         className="inline-flex items-center justify-center h-12 gap-2 px-6 text-sm font-medium tracking-wide text-white transition duration-300 rounded focus-visible:outline-none whitespace-nowrap bg-emerald-300 hover:bg-emerald-400 focus:bg-emerald-600 disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
@@ -138,20 +182,20 @@ export default function EditTodo() {
                   >
                     {/* <!-- Input field --> */}
                     <div className="relative">
+                      <label
+                        htmlFor="title"
+                        className="px-2 text-xs text-emerald-400 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
+                      >
+                        Title
+                      </label>
                       <input
                         id="title"
                         type="text"
                         name="title"
-                        placeholder="write your title"
+                        placeholder={todo.title}
                         {...register("title")}
-                        className="peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+                        className="peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-900 outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
                       />
-                      <label
-                        htmlFor="title"
-                        className="absolute left-2 -top-2 z-[1] px-2 text-xs text-slate-400 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
-                      >
-                        Title
-                      </label>
 
                       {errors.title && (
                         <span className="text-red-500">
@@ -161,21 +205,22 @@ export default function EditTodo() {
                     </div>
                     {/* <!-- Component: Rounded base size basic textarea --> */}
                     <div className="relative">
+                      <label
+                        htmlFor="description"
+                        className="cursor-text peer-focus:cursor-default px-2 text-xs text-emerald-400 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
+                      >
+                        Description
+                      </label>
+
                       <textarea
                         id="description"
                         type="text"
                         name="description"
-                        placeholder="Write your description"
+                        placeholder={todo.description}
                         rows="3"
                         {...register("description")}
-                        className="relative w-full px-4 py-2 text-sm placeholder-transparent transition-all border rounded outline-none focus-visible:outline-none peer border-slate-200 text-slate-500 autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+                        className="relative w-full px-4 py-2 text-sm transition-all border rounded outline-none focus-visible:outline-none peer border-slate-200 text-slate-900 autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
                       ></textarea>
-                      <label
-                        htmlFor="description"
-                        className="cursor-text peer-focus:cursor-default absolute left-2 -top-2 z-[1] px-2 text-xs text-slate-400 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
-                      >
-                        Description
-                      </label>
 
                       {errors.description && (
                         <span className="text-red-500">

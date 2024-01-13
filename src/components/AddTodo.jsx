@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 const createTodoSchema = z.object({
   title: z
@@ -16,7 +17,7 @@ const createTodoSchema = z.object({
     .optional(),
 });
 
-export default function ModalForm() {
+export default function AddTodo() {
   const [isShowing, setIsShowing] = useState(false);
 
   const wrapperRef = useRef(null);
@@ -97,9 +98,29 @@ export default function ModalForm() {
     resolver: zodResolver(createTodoSchema),
   });
 
-  function onCreateTodo(data) {
+  async function onCreateTodo(data) {
     const { title, description } = data;
-    console.log(`${title}, ${description}`);
+
+    const request = await fetch("http://localhost:2121/api/todos", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description,
+      }),
+    });
+
+    const response = await request.json();
+
+    if (request.status === 201) {
+      toast.success("Created todo...");
+    } else {
+      toast.error(response.msg);
+    }
+
     reset();
   }
 
