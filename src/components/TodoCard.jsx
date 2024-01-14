@@ -1,9 +1,44 @@
+import { toast } from "sonner";
 import EditTodo from "./EditTodo";
 
 export default function TodoCard({ todo }) {
-  async function onComplete() {}
+  async function onComplete() {
+    const request = await fetch(`http://localhost:2121/api/todo/${todo._id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        isComplete: true,
+      }),
+    });
 
-  async function onDelete() {}
+    const response = await request.json();
+
+    if (request.status === 200) {
+      toast.success("Completed todo...");
+    } else {
+      toast.error(response.msg);
+    }
+  }
+
+  async function onDelete() {
+    const request = await fetch(`http://localhost:2121/api/todo/${todo._id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+      },
+    });
+
+    const response = await request.json();
+
+    if (request.status === 200) {
+      toast.success("Deleted todo...");
+    } else {
+      toast.error(response.msg);
+    }
+  }
 
   return (
     <>
@@ -14,7 +49,11 @@ export default function TodoCard({ todo }) {
         } shadow-md shadow-slate-200`}
       >
         <div className="p-6">
-          <h3 className="mb-4 text-xl font-medium text-slate-700">
+          <h3
+            className={`mb-4 text-xl font-medium ${
+              todo.isComplete ? "text-white" : "text-slate-700"
+            }`}
+          >
             {todo.title}
           </h3>
           <p>{todo.description}</p>
