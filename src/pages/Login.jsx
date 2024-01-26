@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toaster, toast } from "sonner";
+import Spinner from "../components/Spinner";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -19,7 +20,7 @@ export default function Login() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { isSubmitting, errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
@@ -114,7 +115,15 @@ export default function Login() {
         </div>
         {/*  <!-- Action base sized basic button --> */}
         <div className="flex justify-end p-6 ">
-          <button className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none">
+          {isSubmitting && (
+            <div className="text-center">
+              <Spinner />
+            </div>
+          )}
+          <button
+            disabled={isSubmitting}
+            className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
+          >
             <span>Log in</span>
           </button>
         </div>

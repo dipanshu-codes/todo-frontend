@@ -4,9 +4,11 @@ import TodoCard from "../components/TodoCard";
 import { Toaster, toast } from "sonner";
 
 export default function Home() {
+  const [loading, setLoading] = useState(false);
   const [todos, setTodos] = useState([]);
 
   async function getTodos() {
+    setLoading(true);
     const request = await fetch(
       "https://todos-backend-d8sc.onrender.com/api/todos",
       {
@@ -21,8 +23,10 @@ export default function Home() {
 
     if (request.status === 200) {
       setTodos(response.todos);
+      setLoading(false);
     } else {
       toast.error(response.msg);
+      setLoading(false);
     }
   }
 
@@ -38,6 +42,11 @@ export default function Home() {
       </header>
 
       <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+        {loading && (
+          <div className="text-center">
+            <Spinner />
+          </div>
+        )}
         {todos && todos.map((todo) => <TodoCard key={todo._id} todo={todo} />)}
       </div>
     </>

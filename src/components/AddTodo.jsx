@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import Spinner from "./Spinner";
 
 const createTodoSchema = z.object({
   title: z
@@ -92,7 +93,7 @@ export default function AddTodo() {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isLoading },
+    formState: { errors, isSubmitting },
   } = useForm({
     mode: "onChange",
     resolver: zodResolver(createTodoSchema),
@@ -209,7 +210,15 @@ export default function AddTodo() {
 
                     {/* <!-- Modal actions --> */}
                     <div className="flex justify-center gap-2">
-                      <button className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none">
+                      {isSubmitting && (
+                        <div className="text-center">
+                          <Spinner />
+                        </div>
+                      )}
+                      <button
+                        disabled={isSubmitting}
+                        className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
+                      >
                         <span>Add</span>
                       </button>
                     </div>

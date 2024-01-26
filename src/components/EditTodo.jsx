@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toaster, toast } from "sonner";
+import Spinner from "./Spinner";
 
 const editTodoSchema = z.object({
   title: z
@@ -120,7 +121,7 @@ export default function EditTodo({ todoId }) {
     register,
     handleSubmit,
     reset,
-    formState: { isLoading, errors },
+    formState: { isSubmitting, errors },
   } = useForm({
     resolver: zodResolver(editTodoSchema),
   });
@@ -238,7 +239,15 @@ export default function EditTodo({ todoId }) {
 
                     {/* <!-- Modal actions --> */}
                     <div className="flex justify-center gap-2">
-                      <button className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none">
+                      {isSubmitting && (
+                        <div className="text-center">
+                          <Spinner />
+                        </div>
+                      )}
+                      <button
+                        disabled={isSubmitting}
+                        className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
+                      >
                         <span>Edit</span>
                       </button>
                     </div>
