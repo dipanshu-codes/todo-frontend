@@ -102,7 +102,7 @@ export default function AddTodo() {
     const { title, description } = data;
 
     const request = await fetch(
-      "https://todos-backend-2fq0.onrender.com/api/todos",
+      "https://todos-backend-d8sc.onrender.com/api/todos",
       {
         method: "POST",
         headers: {

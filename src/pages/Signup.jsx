@@ -31,7 +31,7 @@ export default function Signup() {
     const { fullName, email, password } = data;
 
     const request = await fetch(
-      "https://todos-backend-2fq0.onrender.com/api/auth/signup",
+      "https://todos-backend-d8sc.onrender.com/api/auth/signup",
       {
         method: "POST",
         headers: {

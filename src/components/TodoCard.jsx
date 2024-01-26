@@ -4,7 +4,7 @@ import EditTodo from "./EditTodo";
 export default function TodoCard({ todo }) {
   async function onComplete() {
     const request = await fetch(
-      `https://todos-backend-2fq0.onrender.com/api/todo/${todo._id}`,
+      `https://todos-backend-d8sc.onrender.com/api/todo/${todo._id}`,
       {
         method: "PUT",
         headers: {
@@ -28,7 +28,7 @@ export default function TodoCard({ todo }) {
 
   async function onDelete() {
     const request = await fetch(
-      `https://todos-backend-2fq0.onrender.com/api/todo/${todo._id}`,
+      `https://todos-backend-d8sc.onrender.com/api/todo/${todo._id}`,
       {
         method: "DELETE",
         headers: {

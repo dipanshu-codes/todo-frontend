@@ -94,7 +94,7 @@ export default function EditTodo({ todoId }) {
 
   async function getTodo() {
     const request = await fetch(
-      `https://todos-backend-2fq0.onrender.com/api/todo/${todoId}`,
+      `https://todos-backend-d8sc.onrender.com/api/todo/${todoId}`,
       {
         method: "GET",
         headers: {
@@ -129,7 +129,7 @@ export default function EditTodo({ todoId }) {
     const { title, description } = data;
 
     const request = await fetch(
-      `https://todos-backend-2fq0.onrender.com/api/todo/${todoId}`,
+      `https://todos-backend-d8sc.onrender.com/api/todo/${todoId}`,
       {
         method: "PUT",
         headers: {

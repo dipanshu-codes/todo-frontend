@@ -27,7 +27,7 @@ export default function Login() {
   async function onLogin(data) {
     const { email, password } = data;
     const request = await fetch(
-      "https://todos-backend-2fq0.onrender.com/api/auth/login",
+      "https://todos-backend-d8sc.onrender.com/api/auth/login",
       {
         method: "POST",
         headers: {
