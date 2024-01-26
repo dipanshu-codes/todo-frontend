@@ -7,12 +7,15 @@ export default function Home() {
   const [todos, setTodos] = useState([]);
 
   async function getTodos() {
-    const request = await fetch("http://localhost:2121/api/todos", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
-      },
-    });
+    const request = await fetch(
+      "https://todos-backend-2fq0.onrender.com/api/todos",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+        },
+      }
+    );
 
     const response = await request.json();
 

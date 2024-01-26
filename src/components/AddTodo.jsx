@@ -101,17 +101,20 @@ export default function AddTodo() {
   async function onCreateTodo(data) {
     const { title, description } = data;
 
-    const request = await fetch("http://localhost:2121/api/todos", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        description,
-      }),
-    });
+    const request = await fetch(
+      "https://todos-backend-2fq0.onrender.com/api/todos",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          description,
+        }),
+      }
+    );
 
     const response = await request.json();
 

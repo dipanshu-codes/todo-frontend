@@ -3,16 +3,19 @@ import EditTodo from "./EditTodo";
 
 export default function TodoCard({ todo }) {
   async function onComplete() {
-    const request = await fetch(`http://localhost:2121/api/todo/${todo._id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        isComplete: true,
-      }),
-    });
+    const request = await fetch(
+      `https://todos-backend-2fq0.onrender.com/api/todo/${todo._id}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          isComplete: true,
+        }),
+      }
+    );
 
     const response = await request.json();
 
@@ -24,12 +27,15 @@ export default function TodoCard({ todo }) {
   }
 
   async function onDelete() {
-    const request = await fetch(`http://localhost:2121/api/todo/${todo._id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
-      },
-    });
+    const request = await fetch(
+      `https://todos-backend-2fq0.onrender.com/api/todo/${todo._id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+        },
+      }
+    );
 
     const response = await request.json();
 

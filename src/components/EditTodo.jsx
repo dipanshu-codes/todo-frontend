@@ -93,12 +93,15 @@ export default function EditTodo({ todoId }) {
   }, [isShowing]);
 
   async function getTodo() {
-    const request = await fetch(`http://localhost:2121/api/todo/${todoId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
-      },
-    });
+    const request = await fetch(
+      `https://todos-backend-2fq0.onrender.com/api/todo/${todoId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+        },
+      }
+    );
 
     const response = await request.json();
 
@@ -125,17 +128,20 @@ export default function EditTodo({ todoId }) {
   async function onEditTodo(data) {
     const { title, description } = data;
 
-    const request = await fetch(`http://localhost:2121/api/todo/${todoId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        description,
-      }),
-    });
+    const request = await fetch(
+      `https://todos-backend-2fq0.onrender.com/api/todo/${todoId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          description,
+        }),
+      }
+    );
 
     const response = await request.json();
 
