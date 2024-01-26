@@ -116,7 +116,7 @@ export default function Login() {
         {/*  <!-- Action base sized basic button --> */}
         <div className="flex flex-col justify-end p-6 ">
           {isSubmitting && (
-            <div className="text-center">
+            <div className="flex justify-center items-center">
               <Spinner />
             </div>
           )}

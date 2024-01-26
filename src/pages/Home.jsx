@@ -44,7 +44,7 @@ export default function Home() {
 
       <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
         {loading && (
-          <div className="text-center">
+          <div className="flex justify-center items-center">
             <Spinner />
           </div>
         )}

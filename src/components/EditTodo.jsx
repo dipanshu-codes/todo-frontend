@@ -240,7 +240,7 @@ export default function EditTodo({ todoId }) {
                     {/* <!-- Modal actions --> */}
                     <div className="flex flex-col justify-center gap-2">
                       {isSubmitting && (
-                        <div className="text-center">
+                        <div className="flex justify-center items-center">
                           <Spinner />
                         </div>
                       )}
