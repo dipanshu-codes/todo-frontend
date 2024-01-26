@@ -18,22 +18,8 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/dashboard"
-            element={
-              token ? <Navigate to={<Home />} /> : <Navigate to={<Login />} />
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              token ? (
-                <Navigate to={<Profile />} />
-              ) : (
-                <Navigate to={<Login />} />
-              )
-            }
-          />
+          <Route path="/dashboard" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </>
