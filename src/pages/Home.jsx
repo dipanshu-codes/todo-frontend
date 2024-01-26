@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AddTodo from "../components/AddTodo";
 import TodoCard from "../components/TodoCard";
 import { Toaster, toast } from "sonner";
+import Spinner from "../components/Spinner";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);

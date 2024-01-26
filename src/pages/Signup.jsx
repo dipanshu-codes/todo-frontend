@@ -138,7 +138,7 @@ export default function Signup() {
           </div>
         </div>
         {/*  <!-- Action base sized basic button --> */}
-        <div className="flex justify-end p-6">
+        <div className="flex flex-col justify-end p-6">
           {isSubmitting && (
             <div className="text-center">
               <Spinner />

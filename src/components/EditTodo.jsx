@@ -238,7 +238,7 @@ export default function EditTodo({ todoId }) {
                     {/* <!-- End Rounded base size basic textarea --> */}
 
                     {/* <!-- Modal actions --> */}
-                    <div className="flex justify-center gap-2">
+                    <div className="flex flex-col justify-center gap-2">
                       {isSubmitting && (
                         <div className="text-center">
                           <Spinner />
