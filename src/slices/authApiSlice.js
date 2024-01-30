@@ -10,6 +10,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      providesTags: ["User"],
     }),
     signup: builder.mutation({
       query: (data) => ({
@@ -17,8 +18,29 @@ export const authApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      providesTags: ["User"],
+    }),
+    profile: builder.query({
+      query: () => ({
+        url: "/api/user",
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
+    updateProfile: builder.mutation({
+      query: (data) => ({
+        url: "/api/user",
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
     }),
   }),
 });
 
-export const { useLoginMutation, useSignupMutation } = authApiSlice;
+export const {
+  useLoginMutation,
+  useSignupMutation,
+  useProfileQuery,
+  useUpdateProfileMutation,
+} = authApiSlice;

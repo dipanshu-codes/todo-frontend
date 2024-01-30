@@ -91,7 +91,7 @@ export default function AddTodo() {
     }
   }, [isShowing]);
 
-  const [createTodo, { isLoading, isSuccess }] = useCreateTodoMutation();
+  const [createTodo, { isLoading }] = useCreateTodoMutation();
 
   const {
     register,

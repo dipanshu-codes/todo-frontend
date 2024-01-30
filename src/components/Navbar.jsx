@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../slices/authSlice";
-
+import { FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 
@@ -38,22 +38,11 @@ export default function Navbar() {
                 <>
                   <div className="flex items-center lg:ml-0 lg:p-0">
                     {/*        <!-- Avatar --> */}
-                    <a
-                      href="#"
-                      className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-white"
-                    >
-                      <img
-                        src="https://i.pravatar.cc/40?img=35"
-                        alt="user name"
-                        title="user name"
-                        width="40"
-                        height="40"
-                        className="max-w-full rounded-full"
-                      />
-                      <span className="absolute bottom-0 right-0 inline-flex items-center justify-center gap-1 rounded-full border-2 border-white bg-pink-500 p-1 text-sm text-white">
-                        <span className="sr-only"> 7 new emails </span>
-                      </span>
-                    </a>
+
+                    <Link to="/profile">
+                      <FaUserCircle className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-black" />
+                    </Link>
+
                     {/*        <!-- End Avatar --> */}
                   </div>
                   <button
