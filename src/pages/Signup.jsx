@@ -1,9 +1,14 @@
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toaster, toast } from "sonner";
 import Spinner from "../components/Spinner";
+
+import { useSelector, useDispatch } from "react-redux";
+import { setCredentials } from "../slices/authSlice";
+import { useSignupMutation } from "../slices/authApiSlice";
 
 const signupSchema = z.object({
   fullName: z
@@ -18,12 +23,22 @@ const signupSchema = z.object({
 
 export default function Signup() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [signup, { isLoading }] = useSignupMutation();
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { isSubmitting, errors },
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(signupSchema),
   });
@@ -31,28 +46,14 @@ export default function Signup() {
   async function onSignup(data) {
     const { fullName, email, password } = data;
 
-    const request = await fetch(
-      "https://todos-backend-d8sc.onrender.com/api/auth/signup",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullName,
-          email,
-          password,
-        }),
-      }
-    );
-    const response = await request.json();
-
-    if (request.ok) {
-      toast.success("User created successfully...");
-      localStorage.setItem("user", JSON.stringify(response.token));
+    try {
+      const response = await signup({ fullName, email, password }).unwrap();
+      dispatch(setCredentials({ ...response }));
+      toast.success("User created");
       navigate("/dashboard");
-    } else {
-      toast.error(`${response.msg}`);
+    } catch (err) {
+      console.log(err?.data?.message || err.error);
+      toast.error(err?.data?.message || err.error);
     }
 
     reset();
@@ -139,13 +140,13 @@ export default function Signup() {
         </div>
         {/*  <!-- Action base sized basic button --> */}
         <div className="flex flex-col justify-end p-6">
-          {isSubmitting && (
+          {isLoading && (
             <div className="flex justify-center items-center">
               <Spinner />
             </div>
           )}
           <button
-            disabled={isSubmitting}
+            disabled={isLoading}
             className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
           >
             <span>Create account</span>

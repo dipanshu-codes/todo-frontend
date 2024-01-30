@@ -1,9 +1,14 @@
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toaster, toast } from "sonner";
 import Spinner from "../components/Spinner";
+
+import { useSelector, useDispatch } from "react-redux";
+import { setCredentials } from "../slices/authSlice";
+import { useLoginMutation } from "../slices/authApiSlice";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -15,39 +20,38 @@ const loginSchema = z.object({
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [login, { isLoading }] = useLoginMutation();
+
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [navigate, user]);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { isSubmitting, errors },
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
 
   async function onLogin(data) {
     const { email, password } = data;
-    const request = await fetch(
-      "https://todos-backend-d8sc.onrender.com/api/auth/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      }
-    );
-    const response = await request.json();
 
-    if (request.ok) {
-      toast.success("Credentials verified successfully...");
-      localStorage.setItem("user", JSON.stringify(response.token));
+    try {
+      const response = await login({ email, password }).unwrap();
+      dispatch(setCredentials({ ...response }));
+      toast.success("Logging in");
       navigate("/dashboard");
-    } else {
-      toast.error(`${response.msg}`);
+    } catch (err) {
+      console.log(err?.data.message || err.error);
+      toast.error(err?.data.message || err.error);
     }
 
     reset();
@@ -115,13 +119,13 @@ export default function Login() {
         </div>
         {/*  <!-- Action base sized basic button --> */}
         <div className="flex flex-col justify-end p-6 ">
-          {isSubmitting && (
+          {isLoading && (
             <div className="flex justify-center items-center">
               <Spinner />
             </div>
           )}
           <button
-            disabled={isSubmitting}
+            disabled={isLoading}
             className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
           >
             <span>Log in</span>

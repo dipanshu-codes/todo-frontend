@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Toaster, toast } from "sonner";
 import Spinner from "./Spinner";
 
+import { useGetTodoQuery, useUpdateTodoMutation } from "../slices/todoApiSlice";
+
 const editTodoSchema = z.object({
   title: z
     .string()
@@ -21,9 +23,11 @@ const editTodoSchema = z.object({
     .optional(),
 });
 
-export default function EditTodo({ todoId }) {
+export default function EditTodo({ todoId, isComplete }) {
   const [isShowing, setIsShowing] = useState(false);
-  const [todo, setTodo] = useState(null);
+
+  const { data } = useGetTodoQuery(todoId);
+  const [updateTodo, { isLoading, isSuccess }] = useUpdateTodoMutation();
 
   const wrapperRef = useRef(null);
 
@@ -93,35 +97,11 @@ export default function EditTodo({ todoId }) {
     }
   }, [isShowing]);
 
-  async function getTodo() {
-    const request = await fetch(
-      `https://todos-backend-d8sc.onrender.com/api/todo/${todoId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
-        },
-      }
-    );
-
-    const response = await request.json();
-
-    if (request.status === 200) {
-      setTodo(response.todo);
-    } else {
-      toast.error(response.msg);
-    }
-  }
-
-  useEffect(() => {
-    getTodo();
-  }, []);
-
   const {
     register,
     handleSubmit,
     reset,
-    formState: { isSubmitting, errors },
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(editTodoSchema),
   });
@@ -129,27 +109,15 @@ export default function EditTodo({ todoId }) {
   async function onEditTodo(data) {
     const { title, description } = data;
 
-    const request = await fetch(
-      `https://todos-backend-d8sc.onrender.com/api/todo/${todoId}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          description,
-        }),
+    try {
+      await updateTodo({ id: todoId, data: { title, description } });
+
+      if (isSuccess) {
+        toast.success("Todo updated...");
       }
-    );
-
-    const response = await request.json();
-
-    if (request.status === 200) {
-      toast.success("Todo updated...");
-    } else {
-      toast.error(response.msg);
+    } catch (err) {
+      console.log(err?.data?.message || err.error);
+      toast.error(err?.data?.message || err.error);
     }
 
     reset();
@@ -160,7 +128,8 @@ export default function EditTodo({ todoId }) {
       <Toaster richColors />
       <button
         onClick={() => setIsShowing(true)}
-        className="inline-flex items-center justify-center h-12 gap-2 px-6 text-sm font-medium tracking-wide text-white transition duration-300 rounded focus-visible:outline-none whitespace-nowrap bg-emerald-300 hover:bg-emerald-400 focus:bg-emerald-600 disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
+        disabled={isComplete}
+        className="inline-flex items-center justify-center h-12 gap-2 px-6 text-sm font-medium tracking-wide text-white transition duration-300 rounded focus-visible:outline-none whitespace-nowrap bg-emerald-300 hover:bg-emerald-400 focus:bg-emerald-600 disabled:cursor-not-allowed disabled:border-emerald-500 disabled:bg-emerald-700 disabled:shadow-none"
       >
         <span>Edit</span>
       </button>
@@ -199,7 +168,7 @@ export default function EditTodo({ todoId }) {
                         id="title"
                         type="text"
                         name="title"
-                        placeholder={todo.title}
+                        placeholder={data.todo.title}
                         {...register("title")}
                         className="peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-900 outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
                       />
@@ -223,7 +192,7 @@ export default function EditTodo({ todoId }) {
                         id="description"
                         type="text"
                         name="description"
-                        placeholder={todo.description}
+                        placeholder={data.todo.description}
                         rows="3"
                         {...register("description")}
                         className="relative w-full px-4 py-2 text-sm transition-all border rounded outline-none focus-visible:outline-none peer border-slate-200 text-slate-900 autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
@@ -239,13 +208,13 @@ export default function EditTodo({ todoId }) {
 
                     {/* <!-- Modal actions --> */}
                     <div className="flex flex-col justify-center gap-2">
-                      {isSubmitting && (
+                      {isLoading && (
                         <div className="flex justify-center items-center">
                           <Spinner />
                         </div>
                       )}
                       <button
-                        disabled={isSubmitting}
+                        disabled={isLoading}
                         className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
                       >
                         <span>Edit</span>

@@ -6,20 +6,27 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import { useSelector } from "react-redux";
 
 export default function App() {
-  const token = JSON.parse(localStorage.getItem("user"));
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-20">
+      <div className="container mx-auto px-10 lg:px-20 ">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/dashboard"
+            element={user ? <Home /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/profile"
+            element={user ? <Profile /> : <Navigate to="/login" />}
+          />
         </Routes>
       </div>
     </>

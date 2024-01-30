@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import Spinner from "./Spinner";
 
+import { useCreateTodoMutation } from "../slices/todoApiSlice";
+
 const createTodoSchema = z.object({
   title: z
     .string()
@@ -89,40 +91,30 @@ export default function AddTodo() {
     }
   }, [isShowing]);
 
+  const [createTodo, { isLoading, isSuccess }] = useCreateTodoMutation();
+
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({
-    mode: "onChange",
     resolver: zodResolver(createTodoSchema),
   });
 
   async function onCreateTodo(data) {
     const { title, description } = data;
 
-    const request = await fetch(
-      "https://todos-backend-d8sc.onrender.com/api/todos",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          description,
-        }),
-      }
-    );
+    try {
+      await createTodo({
+        title,
+        description,
+      });
 
-    const response = await request.json();
-
-    if (request.status === 201) {
-      toast.success("Created todo...");
-    } else {
-      toast.error(response.msg);
+      toast.success("Created todo");
+    } catch (err) {
+      console.log(err?.data?.message || err.error);
+      toast.error(err?.data?.message || err.error);
     }
 
     reset();
@@ -210,13 +202,13 @@ export default function AddTodo() {
 
                     {/* <!-- Modal actions --> */}
                     <div className="flex flex-col justify-center gap-2">
-                      {isSubmitting && (
+                      {isLoading && (
                         <div className="flex justify-center items-center">
                           <Spinner />
                         </div>
                       )}
                       <button
-                        disabled={isSubmitting}
+                        disabled={isLoading}
                         className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
                       >
                         <span>Add</span>
