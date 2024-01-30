@@ -16,9 +16,18 @@ export default function App() {
       <Navbar />
       <div className="container mx-auto px-10 lg:px-20 ">
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={user ? <Navigate to="/dashboard" /> : <Landing />}
+          />
+          <Route
+            path="/signup"
+            element={user ? <Navigate to="/dashboard" /> : <Signup />}
+          />
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/dashboard" /> : <Login />}
+          />
           <Route
             path="/dashboard"
             element={user ? <Home /> : <Navigate to="/login" />}
